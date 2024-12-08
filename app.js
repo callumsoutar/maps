@@ -89,7 +89,7 @@ function findWindyAirports(metarData) {
     }
 }
 
-// Find and log airports with windgust greater than 24
+// Find and log airports with wind gusts greater than 24
 function findGustyAirports(metarData) {
     const gustyAirports = metarData.filter(airport => airport.windgust > 24);
 
@@ -106,15 +106,15 @@ function findGustyAirports(metarData) {
 
 // Update flight conditions for airports with windspeed above 29
 function updateWindyAirportConditions(nzAirports, metarData) {
-    const windyAirports = metarData.filter(airport => airport.windspeed > 24);
+    const windyAirports = metarData.filter(airport => airport.windspeed > 29);
 
     windyAirports.forEach(windyAirport => {
         const airportCode = windyAirport.ident;
 
-        // If the airport is found in our list of NZ airports, update its condition to 'windy'
+        // If the airport is found in our list of NZ airports, update its condition to 'Windy'
         const airport = nzAirports.find(airport => airport.ident === airportCode);
         if (airport) {
-            airport.flightcategory = 'windy'; // Update the flight condition to 'windy'
+            airport.flightcategory = 'Windy'; // Update the flight condition to 'Windy'
         }
     });
 }
@@ -126,10 +126,10 @@ function updateGustyAirportConditions(nzAirports, metarData) {
     gustyAirports.forEach(gustyAirport => {
         const airportCode = gustyAirport.ident;
 
-        // If the airport is found in our list of NZ airports, update its condition to 'gusty'
+        // If the airport is found in our list of NZ airports, update its condition to 'Gusty'
         const airport = nzAirports.find(airport => airport.ident === airportCode);
         if (airport) {
-            airport.flightcategory = 'gusty'; // Update the flight condition to 'gusty'
+            airport.flightcategory = 'Gusty'; // Update the flight condition to 'Gusty'
         }
     });
 }
@@ -158,9 +158,9 @@ function addMarkersToMap(nzAirports) {
                 markerColor = 'green'; // VFR is good weather, so green
             } else if (flightCategory === 'LIFR') {
                 markerColor = 'purple'; // LIFR is very poor conditions, so purple
-            } else if (flightCategory === 'windy') {
+            } else if (flightCategory === 'Windy') {
                 markerColor = 'blue'; // Windy is blue
-            } else if (flightCategory === 'gusty') {
+            } else if (flightCategory === 'Gusty') {
                 markerColor = 'magenta'; // Gusty is magenta
             }
 
@@ -174,72 +174,91 @@ function addMarkersToMap(nzAirports) {
     });
 }
 
-// Create the Legend with hoverable question marks for more info
+// Create the Legend with Show/Hide Functionality
 function createLegend() {
-    const legend = L.control({ position: 'topright' });
+    const legend = L.control({ position: 'bottomright' });
 
     legend.onAdd = function () {
-        const div = L.DomUtil.create('div', 'info legend');
-        const categories = [
-            { color: 'green', label: 'VFR', description: 'Visual Flight Rules (Good weather)' },
-            { color: 'yellow', label: 'MVFR', description: 'Marginal VFR (Moderate weather)' },
-            { color: 'red', label: 'IFR', description: 'Instrument Flight Rules (Poor weather)' },
-            { color: 'purple', label: 'LIFR', description: 'Low IFR (Very poor conditions)' },
-            { color: 'blue', label: 'Windy', description: 'Strong winds (Windspeed > 29)' },
-            { color: 'magenta', label: 'Gusty', description: 'High gusts (Wind Gust > 24)' }
-        ];
-
-        categories.forEach(category => {
-            div.innerHTML +=
-                `<i style="background:${category.color}"></i> ${category.label} 
-                <span class="question-mark" title="${category.description}">?</span><br>`;
-        });
-
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML = `
+            <button id="toggle-legend" class="legend-toggle">Hide Legend</button>
+            <div id="legend-content" class="legend-content">
+                <div><i style="background:green"></i> VFR: Visual Flight Rules (Ideal conditions).</div>
+                <div><i style="background:yellow"></i> MVFR: Marginal VFR (Flyable but worse).</div>
+                <div><i style="background:red"></i> IFR: Instrument Flight Rules (Poor visibility).</div>
+                <div><i style="background:purple"></i> LIFR: Low IFR (Very poor visibility).</div>
+                <div><i style="background:blue"></i> Windy: Strong winds.</div>
+                <div><i style="background:magenta"></i> Gusty: Intermittent gusts.</div>
+            </div>`;
         return div;
     };
 
     legend.addTo(map);
+
+    // Toggle Legend Visibility
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.id === 'toggle-legend') {
+            const content = document.getElementById('legend-content');
+            const button = document.getElementById('toggle-legend');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                button.textContent = 'Hide Legend';
+            } else {
+                content.style.display = 'none';
+                button.textContent = 'Show Legend';
+            }
+        }
+    });
 }
 
-// Add CSS for the question mark and tooltips
-const style = document.createElement('style');
-style.innerHTML = `
-    .info.legend {
-        background: white;
-        padding: 10px;
-        border-radius: 5px;
-        font-size: 14px;
-        box-shadow: 0px 0px 5px rgba(0,0,0,0.2);
+function toggleLegendVisibility() {
+    const legend = document.querySelector('.legend');
+    if (window.innerWidth <= 768) {
+        legend.style.display = 'none';  // Hide legend on mobile screens
+    } else {
+        legend.style.display = 'block'; // Show legend on larger screens
     }
+}
 
-    .info.legend i {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 8px;
+function toggleLegendOnMobile() {
+    const legend = document.querySelector('.legend');
+    if (legend.style.display === 'block') {
+        legend.style.display = 'none'; // Hide legend
+    } else {
+        legend.style.display = 'block'; // Show legend
     }
+}
 
-    .info.legend .question-mark {
-        font-size: 16px;
-        color: gray;
-        cursor: pointer;
-        margin-left: 5px;
-    }
+// Create the mobile pop-up button
+function createMobileLegendButton() {
+    const button = document.createElement('div');
+    button.className = 'legend-toggle-mobile';
+    button.innerText = 'View Legend';
+    document.body.appendChild(button);
 
-    .info.legend .question-mark:hover {
-        color: black;
+    button.addEventListener('click', toggleLegendOnMobile);
+}
+
+// Initialize mobile legend button on page load
+window.addEventListener('load', () => {
+    if (window.innerWidth <= 768) {
+        createMobileLegendButton();
     }
-`;
-document.head.appendChild(style);
+});
+
+
+// Run on page load and resize
+window.addEventListener('load', toggleLegendVisibility);
+window.addEventListener('resize', toggleLegendVisibility);
+
+
 
 // Initialize the map (Leaflet.js)
 const map = L.map('map').setView([-41.2867, 174.7762], 6);  // Default to New Zealand coordinates
 
+// Add a tile layer (using OpenStreetMap tiles)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// Fetch and display METAR data
+// Fetch METAR data
 fetchMetarData();
 
-// Create the legend for the map
-createLegend();
