@@ -1,0 +1,71 @@
+/* Hide the legend on mobile screens initially */
+@media screen and (max-width: 768px) {
+    .legend {
+        display: none;
+    }
+
+    /* Show the mobile pop-up button */
+    .legend-toggle-mobile {
+        display: block;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background-color: #007BFF;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Hide the mobile pop-up button on larger screens */
+@media screen and (min-width: 769px) {
+    .legend-toggle-mobile {
+        display: none;
+    }
+}
+
+/* Main map container */
+#map {
+    flex-grow: 1;
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    max-height: calc(100vh - 60px); /* Account for header/footer if necessary */
+    box-sizing: border-box;
+}
+
+/* Ensure full height layout for body and HTML */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    height: 100%; /* Full height */
+    overflow: hidden; /* Prevent scrollbars from affecting layout */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Adjust header and footer to occupy only their necessary height */
+header {
+    background: #2d3e50; /* Dark aviation color */
+    color: #fff;
+    padding: 10px 20px; /* Adjust padding for smaller screens */
+    text-align: center;
+    font-size: 1.2rem; /* Slightly smaller font size */
+    font-weight: 600;
+    flex-shrink: 0; /* Prevent header from growing */
+}
+
+footer {
+    background: #2d3e50;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    font-size: 0.9rem;
+    flex-shrink: 0; /* Prevent footer from growing */
+}
